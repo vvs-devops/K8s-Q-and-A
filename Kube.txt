@@ -1,0 +1,49 @@
+Kubernets:
+
+1) what is Kubernets?
+Kubernetes, often shortened to K8s, is an open-source system for automating the deployment, scaling, and management of containerized applications. Think of it as the conductor of an orchestra, ensuring all the containerized parts of your application play together in harmony.
+* Deployment:
+* Scaling
+* Management
+
+2) Benifits of Kubernetes?
+Efficiency: You spend less time managing infrastructure and more time focusing on your application.
+Scalability: Easily handle fluctuating traffic without worrying about infrastructure limitations.
+Reliability: Kubernetes ensures your application is always up and running, even if individual containers fail.
+Portability: Run your application anywhere, on-premises, in the cloud, or hybrid environments.
+Flexibility: Kubernetes is customizable and extensible, allowing you to adapt it to your specific needs.
+
+3) What is the Kubernetes architecture explain in detail?
+
+Kubernetes architecture consists of two main parts:
+
+Control Plane: The brain of the operation, responsible for making decisions and managing the state of the cluster.
+Worker Nodes: The workhorses, where containerized applications actually run.
+Let's dive deeper into each component:
+
+Control Plane:
+
+Comprises several key components:
+API Server: The single entry point for all cluster management operations. It receives requests from users and tools, validates them, and instructs other components to take action.
+etcd: A distributed key-value store that holds the cluster's desired state. It stores information about pods, deployments, services, and other Kubernetes objects.
+Controller Manager: Runs various controllers in the background, each responsible for specific tasks like managing pod replicas, scaling deployments, and handling network policies.
+Scheduler: Assigns pods to worker nodes based on resource availability and constraints.
+Highly available: Can be deployed in a multi-master configuration for redundancy.
+Usually lightweight: Doesn't run containerized applications itself.
+
+4) What is Replication controller & what it does ?
+A Replication Controller is a structure that enables you to easily create multiple pods, then make sure that that number of pods always exists. If a pod does crash, the Replication Controller replaces it.
+
+5) What is the difference between the replication controller and a replica set?
+6) What is Daemon set ?
+DaemonSet is a Kubernetes feature that lets you run a Kubernetes pod on all cluster nodes that meet certain criteria. Every time a new node is added to a cluster, the pod is added to it, and when a node is removed from the cluster, the pod is removed.
+<!-- 7) Difference between Kubernetes & Docker Swarm ? -->
+Docker Swarm and Kubernetes are both popular container orchestration tools used to manage the deployment, scaling, and networking of containerized applications. While both share similar goals, they have distinct characteristics that cater to different needs. 
+Use Kubernetes if:
+You need a highly scalable and feature-rich platform for large-scale deployments.
+You value self-healing, rolling updates, advanced resource management, and integration with diverse tools.
+Your team has the technical expertise to handle its complexity.
+Use Docker Swarm if:
+You prioritize ease of use and a quick learning curve.
+You primarily focus on Docker containers and don't need advanced features.
+You have a smaller team or limited resources for learning and managing a complex system.
