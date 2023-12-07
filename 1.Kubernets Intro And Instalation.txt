@@ -1,0 +1,195 @@
+Kubernetes:
+Day:1
+-- Kubernetes is an orchestration engine and open source platform for managing containerized applications.
+-- Responsibilities include container deployment, scaling ,descalling of containers & containers load balancing.
+Kubernetes Features:
+1.Automated scheduling
+2.Self healing capabilities
+3.Automated rollouts & rollback
+4.Horizontal scalling & Load Balancing
+5. Service Discovery & Load balancing
+6.Storage orchestration
+
+k8s CLuster --> Gropu of k8s Machines/Nodes/Services.
+Container Run Time --> Docker ,container-d ,CRI-O ,Core os
+----------------------------------------------------------------/
+
+
+Day:2
+
+--Self managed K8s Cluster
+
+ minikube --> minikube is local or single node cluster.we can use miniqube to setup k8s locally.
+              https://minikube.sigs.k8s.io/docs/start/
+			  
+ kubeadm --> Using kubeadm we can set up multi node k8s cluster.
+ kubespray
+
+--Managed K8s Cluster:
+EKS --> Elastic K8s Service(AWS)
+AKS --> Azure K8s Service(Microsoft Azure)
+GKE --> Google K8s Engine(GCP)
+IKS --> IBM K8s Engine(IBM Cloud)
+
+
+ ******* Installlation OF Kubernetes Cluster *******
+
+Prerequisite:
+
+3 - Ubuntu Servers
+1 - Manager (4gb Ram ,2 core) t2.medium
+2 - Workers (1gb, 1 core) t2.micro
+
+Note: Open Required prots inAWS Security groups.for now we will open all trafic.
+CONTROL PLANE NODE (MASTER NODE )
+   TCP 6443         Kubernetes API Server
+       2379-2380    etcd server client API
+	   10250		Kubelet API
+	   10251		Kube-scheduler
+	   10252		Kube control manger
+	   
+Worker Node(s):
+TCP     10250       Kublet API
+		30000-32767 NodePort Services
+	   
+
+=========== COMMON FOR MASTER & SLAVE START=========
+
+1) switch to root user
+sudo su -
+
+2) Turn off Swap Space
+swapoff -a
+sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+3. Install packages. to  install kubernetes and containerd run therse commands:
+apt update -y
+
+sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+
+mkdir -m 755 /etc/apt/keyrings
+
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+sudo apt-get update
+
+sudo apt-get install -y kubelet kubeadm kubectl containerd
+
+apt-mark hold kubelet kubeadm kubectl containerd
+-------------------------------------------------------------------
+
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+overlay
+br_netfilter
+EOF
+
+sudo modprobe overlay
+sudo modprobe br_netfilter
+
+
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-iptables  = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.ipv4.ip_forward                 = 1
+EOF
+
+sysctl --system
+
+
+------------------------------
+6) Configuring Containerd
+
+mkdir -p /etc/containerd
+containerd config default | sudo tree /etc/containerd/config.toml
+               (or)
+containerd config default > /etc/containerd/config.toml			   
+systemctl restart containerd
+--------------------------------
+7) start and enable kublet service
+# Enable ans start kublet service
+systemctl daemon-reload
+systemctl start kubelet
+systemctl enable kubelet.service
+----------------------------------
+=========== COMMON FOR MASTER & SLAVE END=========
+=========== IN MASTER NODE START=========
+# steps only for kuberbetes Master
+# switch to the root user.
+Sudo su -
+
+kubeadm init
+
+#if you want to initalize kubernets on public EndPoint(not recommnded in real time).You can use below option Replica Public_IP with actual public ip of yoour kubernetes master node (recommended to use Elestic(create and assign elastic ip to master node and use that elastic ip below))).Replica PORT with 6463(API Server Port).
+
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+-- kubectl get node
+--kubectl get pod -n kube-system
+-- kubectl get pod -n kube-system -o wide
+
+
+kubernetes network addons: wave drive 
+
+kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
+
+
+kubeadm token create --print-join-command
+
+kubeadm join 172.31.47.50:6443 --token oqdsrd.k1vyt6jd4zedu801 --discovery-token-ca-cert-hash sha256:08e06c44bf8b5d79f4ab2dd994387d196c8d80a7ea665c820583607eaea7c4ae
+
+https://www.youtube.com/watch?v=OywF5oARYSI&ab_channel=AareezAsif
+-----------------------------------------------------------------------------////
+
+kubectl version --client
+ls .kube/
+cat .kube/config
+kubectl get nodes
+kubectl get nodes -v=8
+---------------------------------------------------------------------------------------
+
+
+Day3:
+
+Kubernetes Objects/API/Resources/Workloads:
+kubernetes objects are persistent entites in the kubenetes system.
+kubectl get all
+
+Namespace
+   kubectl get namespaces (or) kubectl get ns
+   kubectl get all -n kube-system
+ create namespcae
+   kubectl create namespace test-ns
+Pod
+Replicationcontroller
+ReplicaSet
+DaemonSet
+Deployment
+Service
+PersistentVolume
+PersistentVolumeClaim
+StatefulSet
+Configmap
+secret
+StorageClasses
+
+Pod Lifecycle:
+
+--Make a POd request API server using a local pod defination file
+--The API server saves the info for the pod in ETCD
+--The scheduler finds the unschedululed pod and schedules in to node.
+--kubectl runing on the node, sees the pod scheduled and fires up docker.
+--Docker runs the container
+--The entire lifecycle state of the pod is stored in ETCD.
+
+POD CONCEPTS:
+--Pod is ephermeral (lasting for a very short time) and won't be rescheduled to a new node once it dies
+-- you should not directly create/use pod for deployment,kubernetes have controllers like Replica sets,Deployments,Demon sets to keep pod alive.
+
+what is static POD?
+static Pods are directly managed by kubelet running at node there no controllers which will manged the static pod.
+
+ls /etc/kubernetes/manifests	

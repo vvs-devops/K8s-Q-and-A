@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginxpod
+  labels:
+   app:ngnix
+  namespace: test-ns
+spec:
+  containers:
+  - name: nginixcontainer
+    image: ngnix
+    ports:
+    - containerPort: 80
+
+
+# nginixpod.yaml
+
+#kubectl apply -f nginixpod.yaml	
+
+
+POD:
+
+A Pod always runs on a node.
+A pod is the smallest bulliding block or basic unit of scheduling k8s.
+In a kubernetes cluster , a pod represents a running process.
+INside a pod, you can have one or more containers .Those containers all share a unique network ip,stroage,network and any other specification applied to the pod.	
+Each pod has its unique Ip address within the cluster.
+
+Imperative Way :
+----------------
+kubectl run <podName> --image=<ImageTag> -port=<containerPort>
+kubectl run nginxpod --imgae=ngnix --port=80
+kubectl run nginxpod --imgae=ngnix --port=80 -n test-nes
+
+Declartive Way:(kubernetes Mainfest file):
+----------------------------------------
+appversion: v1
+kind:
+metadata:
+sepc:
+
+--- kubectl version --client
+ls ./kube
+cat config
+kubectl get nodes
+kubectl get namespaces
+kubectl get ns
+kubectl get pods
+kubectl get pods -n test-ns
+kubectl get pods -n kube-sysem -o wide
+ps -ef | grep kubelet
+kubectl api-resources
+---
+		
+apiVersion: v1
+kind: Pod
+  metadata:
+  name: <PODName>
+  labels:
+    <key>: <value>
+    namespace: <nsname>
+spec:
+  containers:
+  - name: <containerName>
+    image: <image>
+    ports:
+    - containerPort: <containerPort>
+
+---
+appVersion: v1
+kind: Pod
+metadat:
+  name: ngnixpod
+  labels:
+    app:ngnix
+spec:
+  containers:
+  - name: nginixcontainer
+    image: ngnix
+    ports:
+    - containerPort: 80
+---    
+
+-- kubectl apply -f nginipod.yaml
+
+--kubectl get pods
+--kubectl get pods -n test-ns
+--kubectl get pods -o wide
+--kubectl descride pod nginxpod
+--kubectl logs nginxpod

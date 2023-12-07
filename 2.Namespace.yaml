@@ -1,0 +1,21 @@
+
+create namespcae
+imperative way
+   kubectl create namespace test-ns 
+   kubectl run nginix-demo --image=nginx --port=80 
+Declerative way --> k8s mainfeast file   
+*/
+
+
+
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test-ns
+  labels:
+   team:testingteam
+   teamdl:flipkartqa 
+
+#kubctl apply -f <mainfeastfilename>.yaml
+

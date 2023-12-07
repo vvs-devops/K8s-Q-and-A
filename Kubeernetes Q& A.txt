@@ -47,3 +47,7 @@ Use Docker Swarm if:
 You prioritize ease of use and a quick learning curve.
 You primarily focus on Docker containers and don't need advanced features.
 You have a smaller team or limited resources for learning and managing a complex system.
+
+8)what is differnce b/w Docker Swarm service & K8s Service?
+Docker swarm is container orchestration software using docker swarm we can schedule ,mange,scale and load balencer the containers.
+A service is resposible for mkaing our pod discoverable inside the network or exposing them to the internet. A service identifies pods by its labelselector.
