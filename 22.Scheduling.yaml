@@ -1,0 +1,13 @@
+Scheduling
+------------
+NodeSelector
+NodeAffinity
+PodAffinity
+PodAntiAffinity
+Taints & Tolerations
+
+NodeMaintainence
+----------------
+Cordon
+Uncordon
+Drain

@@ -6,12 +6,37 @@ Kubernetes Features:
 1.Automated scheduling
 2.Self healing capabilities
 3.Automated rollouts & rollback
-4.Horizontal scalling & Load Balancing
+4.Horizontal scalling & Load balancing
 5. Service Discovery & Load balancing
 6.Storage orchestration
 
 k8s CLuster --> Gropu of k8s Machines/Nodes/Services.
 Container Run Time --> Docker ,container-d ,CRI-O ,Core os
+
+kubernets components:
+Master node: the master node is resposible for the management of kubenetes cluster. it is mainly the entry point for all administrative tasks.
+it handles the orchestration of the worker nodes. there can be more than one master node in the cluster to check for fault tolerance.
+Master node components:
+  it has below components thata take care of communication, scheduling and controllers.
+
+API Server: Kube API server interacts with API its a frontend of the kubernetes control plane.Communication center for developers, systemadmin and other kubernetes componets.
+scheduler: scheduler watches the pods and assigns the pods to run on a specific hosts.
+Controller Manager: controller manager runs the controllers in background which runs different tasks in kubernets cluster.Performs cluster-level functions(replication,keeping track of worker nodes,handling nodes failures...)
+ some of controllers are,
+  1.node controller- its Responsibe for noticing and responding when nodes go down.
+  2.Replication controllers- it maintains the number of pods. it controls how many identical copies of a pod should be running somewhwere on the cluster.
+  3.Endpoint controllers joins services and pods together.
+  4.ReplicaSet controller ensure number of replication of pods running at all time.
+  5.Deployment controller provides declarative updates for pods and replicasets.
+  6.daemonset controller ensure all nodes run a copy of specific pod.
+  7.job controller is the supervisor process of pod carring out batch jobs.
+
+ETCD: key value pair Database. kubenetes use etcd as its Database to store all cluster Database.
+  some of the data stored in etcd is job scheduling information,pods ,state information and etc
+
+Worker Node:  Worker nodes are the nodes where the application actually running in kuberbetes cluster,it is also know as minion.These each worker nodes are controlled by the master node using kubelet process.
+Kubelet: kubelet is the primary node agaent runs on each nodes and reads the container mainfeast which ensure that containers are running and healthy.
+kube-proxy: kube-proxy enables the kubernets service abstraction by maintaining network rules on the host and performance 
 ----------------------------------------------------------------/
 
 
@@ -193,3 +218,6 @@ what is static POD?
 static Pods are directly managed by kubelet running at node there no controllers which will manged the static pod.
 
 ls /etc/kubernetes/manifests	
+
+kubectl api-Resources
+

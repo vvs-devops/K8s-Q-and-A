@@ -1,0 +1,109 @@
+Replica Set:
+ReplicaSet is the next-genration(advanced) ReplicationController.
+The only difference between ReplicaSet and Replication Controller is the selector support.
+ReplicatSet the new set-based slector requirements as described in the lables user guide where as a Replication Controller only support equality-based selector rquirements.
+
+RC support only Equality Based Selectors.
+
+RS Supports Equality & Set Based  Selectors.
+
+
+Equality:
+
+app: pythonapp
+  key == value
+
+
+  set Based
+
+  in(abc,xyz)
+
+  not in (adb,xyz)
+---
+apiVersion: app/v1
+kind: ReplicatSet
+metadat:
+  name: <rsName>
+  lables:
+  namepsace: <nsName>
+spec:
+  replicas: <noOFPodReplicas>
+  selector:
+    matchLabels: 		# EqualityBased Selector
+      <PODLablekey>: <value>
+      matchExpressions:   # Set Based Selector
+      - key: <PODLabelKey>
+        operator: In
+        values:
+        - <value1>
+        - <value2>
+  template: # POD Template
+    metadat:
+    name: <podName>
+    labels:
+      <key>: <value>
+  spec:
+    containers:
+    - name: <nameOFTheConatiner>
+      image: <image>
+      ports:
+      - containerPort: <containerPort>	     
+--- 	
+Eg:
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadat:
+  name: pythonapprs
+spec:
+  replicas: 2
+  selector:
+    matchExpressions:
+    - key: app
+      operator: In
+      values: 
+      - pythonapp
+  template:
+    metadata:
+    name: pythodpod	
+    labels:
+      app: pythonapp
+  spec:
+    containers:
+    - name: pythonapp
+      image: vaddevenkat/python-flask-app:1
+      ports:
+      - containerPort: 5000	    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pythonappsvc
+spec:
+  type: NodePort
+  selector:
+    app: pythonapp 
+  ports:
+   - port: 5000
+     targetPort: 5000	
+---     
+    	  
+kubectl apply -f pythonapp.yaml --dry-run=client
+    	  
+kubectl apply -f pythonapp.yaml --dry-run=server
+kubectl get all
+kubectl get rs
+kubectl get rs 	  
+
+
+selector:  
+  matchExpressions:
+  - key: app
+    operator: in
+    values:
+    - pythonapp
+
+
+selector:
+    matchLabels:
+    app: pythonapp

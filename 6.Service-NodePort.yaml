@@ -24,11 +24,10 @@ spec:
      targetPort: 8080
 ---
 
-
 # Emaxple:2
 appVersion: v1
 kind: Pod
-metadat:
+metadata:
   name: mavenwebapp
   labels:
     app:mavenwebapp
@@ -41,7 +40,7 @@ spec:
 ---
 apiVersion: v1
 kind: Service
-metadat:
+metadata:
   name:mavenwebappsvc
 spec:	
   type: NodePort

@@ -1,0 +1,150 @@
+A configmap ia an api object to store non-confidential dat in key-value pairs.pods can consume configmap as environment variables,command-line arrguments or configuration file in a volume.
+ an apps's config is everthing that is likely to vary between deploys(staging,production,developer  environment etc) .this includes database connecctions details amd credentials or cloud credentials...etc
+
+ Both configmap and secrets store data as a key value pair. the major difference is secrets store data in base64 format meanwhile configmaps store data in a plain text 
+
+ ---
+apiVersion: v1 
+kind: ConfigMap 
+metadata:
+  name: springappconfig
+  namespace: test-ns
+data:
+  mongodbusername: devdb
+  mongodbpassword: devdb@123
+---
+apiVersion: v1 
+kind: Secret 
+metadata:
+  name: springappsecrret
+  namespace: test-ns
+type: Opaque
+stringData:
+  mongodbpassword: devdb@123    
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springapps
+  namespace: test-ns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      name:  springapp
+  template:
+    metadata:
+      name: springapppod
+      lables:
+        name: springapp
+    spec:
+      containers:
+      - name: springappcontainer
+        image: vaddevenkat/springboot-application:1
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 200m
+          limits:
+            memory: 500Mi
+            cpu: 500M  
+        ports:
+        - containerPort: 8080
+        env:
+        - name: MONGO_DB_HOSTNAME
+          value: mongodbsvc
+        - name: MONGO_DB_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: springappconfig
+              key: mongodbusername
+        - name: MONGO_DB_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: springappconfig
+              key: mongodbpassword
+---
+apiVersion: v1 
+kind: Service
+metadata:
+  name: springappsvc
+  namespace: test-ns
+spec:
+  type: NodePort
+  selector:
+    name: springapp
+  ports:
+  - port: 80
+  targetPort: 8080
+
+---
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: mongodb
+  namespace: test-ns
+spec:
+  selector:
+    matchLabels:
+      app: mongodb 
+  template:
+    metadata:
+      name: mongodbpod
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongodbcontainer
+        image: mongo
+        ports:
+          - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: springappconfig
+              key: mongodbusername
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: springappconfig
+              key: mongodbpassword
+        volumeMounts:
+        - name:  mongodbvol
+          mountPath: /data/db   
+      volumes:
+        - name:  mongodbvol
+          persistentVolumeClaim:
+          claimName: mongopvc
+---     
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongopvc
+  namespace: test-ns
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi     
+
+---       
+apiVersion: v1 
+kind: Service
+metadata:
+  name: mongodbsvc
+  namespace: test-ns
+spec:
+  selector:
+    app: mongodb
+  ports:
+  - port: 27017
+    targetPort: 27017  
+             
+
+
+
+# kubectl get configmap -n test-ns
+

@@ -1,0 +1,18 @@
+NFS Server Setup:
+ create a Ec2 instances and poen a port NSF in security group in with in the network range.
+
+ sudo apt update -y 
+ sudo apt install nfs-kernel-server -y 
+ sudo mkdir -p /mnt/nfs_share
+sudo chown -R nobody:nogroup /mnt/nfs_share
+sudo chmod 777 -R /mnt/nfs_share
+sudo vi /etc/exports
+   /mnt/nfs_share 172.31.0.0/16(rw sync no_subtree_check no_root_squash)
+   :wq
+sudo exportfs -a 
+sudo systemctl restart nfs-kernel-server
+sudo systemctl status nfs-kernel-server
+   
+
+install client software nfs in all kubernets nodes include master
+-- sudo apt install nfs-common -y  

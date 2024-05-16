@@ -1,0 +1,36 @@
+apiVersion: v1 
+kind: PersistentVolume
+metadata:
+  name: nfsvol
+spec:
+  capacity:
+    storage: 5Gi
+  volumemode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  nfs: 
+    server: 172.31.34.161
+    path: /mnt/nfs_share     
+
+
+---
+/*
+accessModes in volumes:
+
+RWO ---> ReadWriteOnce
+RWX ---> ReadWriteMany
+RoX ---> ReadOnlyMany
+
+Reclaim Policies:
+
+Retain(Default)-->  If we delete PVC it won't delete associated PV if reaclim policy retain.
+
+Recycle ---> If we delete PVC it won't delete associated PV but it will delete the data in that pv. so that pv will be avilable for another claim.
+
+Delete --> if we delete PVC associated pv also gets deleted.
+
+PV --> Persistent volume its a peace of storage .Pv can be provisioned in 2 ways.
+1) static volume
+2) Dynamic Volume
+
+PVC --> its request for a storage (PV). we can specific accessmodes & storage size required for your application via  PVC . PVC will refered/used in POD.

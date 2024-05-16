@@ -1,0 +1,6 @@
+Liveness and Readiness probes are used to control the health of an application running inside a pods container.
+Liveness probes
+   suppose that a pod is running our application inside a container but due to some reasons lets say memory leak,cpu usage. application deadlock ect the application is not responding to our requests, and stuck in error state.
+   Liveness probes checks the container health as well tell it do , and if for some reasosn the liveness probe fsil it restart the container.
+Readiness probe
+  This type of probes is used to detect if a container is ready to accept trafic.You can use this probe to manage which pods are used as backends for load balancing services. if apod is not ready , it can then be removed from the list of load balances.   

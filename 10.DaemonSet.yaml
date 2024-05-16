@@ -1,0 +1,64 @@
+DaemonSet:
+   A daemonSet make sure that all or some kubernetes Nodes run copy of a pod.
+   when an new node is added to the cluster, a Pod is added to it to match the rest of the nodes and when a node is removed from the cluster ,the pod is garbage collected.
+Note: Monitering agent,Log agents installation purpose we are using Daemoset 
+   
+syntax:
+
+apiVersion: apps/v1
+kind: DeamonSet
+metadata:
+  name: <dsName>
+  namespace: <nsname>
+  labels:
+    <key>: <value>	
+spec:
+  selector:
+    matchLabels:
+    <key>: <value>
+  template:
+    metadat:
+    name: <POdName>
+    labels:
+    <key>: <value>
+  spec:
+    containers:
+    - name: <containerName>
+      image: <image>
+      ports:
+      - containerPort: <containerPort>	
+---
+Ex:		
+
+apiVersion: apps/v1
+kind: DeamonSet
+metadata: 
+  name: nginxds
+spec:
+  selector:
+    matchLabels:
+    app: nginx
+  template:
+    metadata:
+    name: nginixpod
+    labels:
+      app: nginx
+  spec:
+    tolerations:
+    - key: "node-role.kubernets.io/control-plane"
+      operator: "Exists"
+      effect: NoSchedule
+    containers:
+    - name: nginxpod
+      image: nginx
+      ports:
+      - containerPort: 80
+---
+
+kubectl get daemonset
+kubectl get ds
+kubectl apply -f nginxds.yaml
+kubectl get all -o wide
+kubectl get nodes
+kubectl get all all --all-namespaces (or) kubectl get all -A
+kubectl get all -A -o wide

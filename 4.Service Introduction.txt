@@ -1,7 +1,7 @@
 Service:
  A service is resposible for mkaing our pod discoverable inside the network or exposing them to the internet. A service identifies pods by its labelselector.
  Service
-1)	ClusterIp 
+1)ClusterIp 
 2)NodePort
 3)LoadBalancer(External load Balancer)
 4)Headless

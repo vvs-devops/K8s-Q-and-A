@@ -23,7 +23,7 @@ not in (adb,xyz)
 # SYNTAX:
 
 apiVersion: app/v1
-kind: ReplicatSet
+kind: ReplicaSet
 metadat:
   name: <rsName>
   lables:
@@ -85,7 +85,7 @@ spec:
   selector:
     app: pythonapp 
   ports:
-   - port: 5000
+   - port: 80
      targetPort: 5000	
 ---
 
@@ -98,4 +98,4 @@ kubectl scale rc mavenwebapprc --replicas=2
 #kubectl apply -f pythonapp.yaml --dry-run=server
 #kubectl get all
 #kubectl get rs
-#kubectl get rs 	      
+      

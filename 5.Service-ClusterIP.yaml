@@ -3,14 +3,13 @@ Declartive Way:
 apiVersion: v1
 kind: Service
 metadata:
-  name:<serviceName>
-service:
-  type: ClusterIP
+  name: <serviceName>
+     /  type: ClusterIP
   selector:            # Pod labels as selector
-     <labelKey>: <labelValue>
-     ports:
-     - port: <servicePort>
-       targetport: <conatainerPort> 
+    <labelKey>: <labelValue>
+  ports:
+    - port: <servicePort>
+      targetport: <conatainerPort> 
 ---       
 
 # Examle
@@ -39,7 +38,6 @@ spec:
   ports:
    - port: 80
      targetPort: 8080
-
 ---
 # Emaxple:2
 appVersion: v1

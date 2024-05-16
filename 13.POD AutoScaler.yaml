@@ -1,0 +1,24 @@
+ POD AutoScaler:
+ 
+ HPA --> Horizantal Pod AutoScaler
+    The Horizantal Pod Auto scaler automatically scales the number of pods in a replication controller, deployment,replica set based oberverd CPU utlization or memory utilization.
+	HPA will interact with Metric server idettify CPU/Memory Utilization of POD.
+ VPA --> Vertical Pod AutoScaler
+ 
+
+ Materic Server:
+
+--metric server is not avilable . you can download it
+--Metric Server is an application that collects metrics from objects such as pods, 
+ nodes according to the state of CPU, RAM and keeps them in time.
+ 
+--Metric Server can be installed in this as an addon. You can take and install it directly from the repo.
+
+search on internet--> Horizontal Pod Autoscaling--> metric server -> open git rpositroy ---
+Instalation:kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+   kubectl get all -n kube-system
+   kubecctl edit deployment metrics-server -o yaml -n kube-system
+   add the tag 
+   --kubelet-insecure-tls
+---
+

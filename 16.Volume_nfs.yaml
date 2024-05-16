@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springapp
+  namespace: test-ns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+    app: springapp
+  template:
+    metadata:
+      lables:
+        app: springapp
+    spec:
+      containers:
+      - name: springappcontsiner
+        image: vaddevenkat/springboot-application:1
+        resources:
+          memory: 256Mi
+          cpu: 200m
+        limits:
+          memory: 512Mi
+          cpu: 500m
+        ports:
+        - containerPort: 8080
+        env:
+        - name: MONGO_DB_HOSTNAME
+          value: mongosvc
+        - name: MONGO_DB_USERNAME
+          value: devdb
+        - name: MONGO_DB_PASSWORD
+          value: devdb123
+---
+apiVersion: v1
+kind: Service     
+metadata:
+  name: springappsvc
+  namespace: test-ns
+spec:
+  type: NodePort
+  selector:
+    app: springapp
+  ports:
+  - port: 80
+    targetPort: 8080  
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: mongodb 
+  namespace: test-ns
+spec:
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      name: mongodbpod 
+      lables:
+        apps: mongodb
+    spec:
+      containers:
+      - name: mongodbcontainer
+        image: mongo 
+        ports:
+        - containerPort: 27017   
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: devdb
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          value: devdb123 
+        volumeMounts:
+        - name:  mongodbvol
+          mountPath: /data/db   
+      volumes:
+        - name:  mongodbvol
+          nfs:
+            server: 172.31.34.161
+            path: /mnt/nfs_share    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name:  mongosvc
+  namespace: test-ns
+spec:
+  selector:
+    app:  mongodb
+  type:  LoadBalancer | ClusterIP | NodePort
+  ports:
+  - port:  27017
+    targetPort:  27017
+            

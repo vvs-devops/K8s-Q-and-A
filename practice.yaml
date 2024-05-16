@@ -1,0 +1,440 @@
+# using environment variables using spring application using mongodb
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springapps
+  namespace: test-ns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: springapp
+  template:
+    metadata:
+      name:  springapppod
+      labels:
+        app: springapp
+    spec:
+      containers:
+      - name: springappcontainer
+        image: vaddevenkat/springboot-application:1
+        ports:
+        - containerPort: 8080
+        env:
+        - name: MONGO_DB_HOSTNAME
+          value: mongodbsvc
+        - name: MONGO_DB_USERNAME
+          values: devdb
+        - name: MONGO_DB_PASSWORD
+          value: devdb123
+---
+apiVersion: v1 
+kind: Service
+metadata:
+  name: springappsvc
+  namepsace: test-ns
+spec:
+  type: NodePort
+  selector:
+    app: springapp
+  ports:
+  - port: 80
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: mongodb
+  namepsace: test-ns
+spec:
+  selector:
+    matchLabels:
+      name: mongodb
+  template:
+    metadata:
+      name: mongodbpod
+      lables:
+        name: mongodb
+    spec:
+      containers:
+      - name: mongodbcontainer
+        image: mongo
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: devdb
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          value: devdb123 
+---
+apiVersion: v1 
+kind: Service
+metadata:
+  name: mongodbsvc
+  namepsace: test-ns
+spec:
+  type: ClusterIP
+  selector:
+    matchLabels:
+      name: mongodb
+  ports:
+  - port: 27017
+    targetPort: 27017
+---
+
+# spring app using  mongodb  using volumes (hostpath)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springapps
+  namespace: test-ns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: springapp
+  template:
+    metadata:
+      name: springapppod
+      lables:
+      app: springapp
+    spec:
+      containers:
+      - name: springappcontainer
+        image: vaddevenkat/springboot-application:1
+        ports:
+        - containerPort: 8080     
+        env:
+        - name: MONGO_DB_HOSTNAME
+          value: mongodbsvc
+        - name: MONGO_DB_USERNAME
+          value: devdb
+        - name: MONGO_DB_PASSWORD
+          value: devdb123
+---
+apiVersion: v1 
+kind: Service
+metadata:
+  name: springapps
+  namespace: test-ns
+spec:
+  selector:
+   matchLabels:
+     app: springapp
+  ports:
+  - port: 80
+    targetPort: 8080
+---
+
+apiVersion: app/v1
+kind: ReplicaSet
+metadata:
+  name: mongodb
+  namespace: test-ns
+spec:
+  selector:
+    matchLabels:
+      name: mongodb
+  template:
+    metadata:
+      name: mongodbpod
+      lables:
+        name: mongodb
+    spec:
+      containers:
+      - name: mongodbcontainer
+        image: mongo
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - name: mongodbvol
+          mountPath: /data/db
+      volumes:
+       name: mongodbvol
+       hostPath:
+         path: /mongodbdata               
+---
+apiVersion: v1 
+kind: Service
+metadata:
+  name: mongosvc
+  namespace: test-ns
+spec:
+  selector:
+    name: mongodb  
+  type: ClusterIP
+  ports:
+  - port: 27017
+    targetPort: 27017
+---
+
+# spring app using  mongodb  using volumes(NFS)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springapp
+  namespace: test-ns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: springapp
+  template:
+    metadata:
+      name: springapppod
+      lables:
+        app: springapp
+    spec:
+      containers:
+      - name: springappcontainer
+        image: vaddevenkat/springboot-application:1
+        ports:
+        - containerPort: 8080
+        env:
+        - name: MONGO_DB_HOSTNAME
+          value: mongosvc
+        - name: MONGO_DB_USERNAME 
+          value: devdb
+        - name: MONGO_DB_PASSWORD
+          value: devdb@123
+---
+apiVersion: v1 
+kind: Service
+metadata:
+  name: springappsvc
+  namespace: test-ns
+spec:
+  type: NodePort
+  selector:  
+    app: springapp
+  ports:
+  - port: 80
+    targetPort: 8080 
+---
+apiVersion: app/v1
+kind: ReplicaSet
+metadata:
+  name: mongodb
+  namepsace: test-ns
+spec:
+  selector:
+    matchLabels:
+      name: mongodb
+  template:
+    name: mongodbpod
+    lables:
+      name: mongodb
+  spec:
+    containers:
+    - name: mongodbcontainer
+      image: mongo
+      ports:
+      - containerPort: 27017
+      env:
+      - name: MONGO_INITDB_ROOT_USERNAME
+        value: devdb
+      - name: MONGO_INITDB_ROOT_PASSWORD
+        value: devdb123 
+        volumeMounts:
+        - name: mongodbvol
+          mountPath: /data/db
+    volumes:
+    - name: mongodbvol
+      nfs:
+        server:
+        path: /mnt/nfs_share     
+---
+apiVersion: v1 
+kind: Service
+metadata: 
+  name: mongosvc
+  namepsace: test-ns
+spec:
+  selector:
+    name: mongodb
+  type: ClusterIP
+  ports:
+  - port: 27017
+    targetPort: 27017
+---            
+# NFS Server Setup:
+    # create a Ec2 instances and open a port NSF in security group in with in the network range.
+
+      # sudo apt update -y 
+      # sudo apt install nfs-kernel-server -y 
+      # sudo mkdir -p /mnt/nfs_share
+      # sudo chown -R nobody:nogroup /mnt/nfs_share
+      # sudo chmod 777 -R /mnt/nfs_share
+      # sudo vi /etc/exports
+          # /mnt/nfs_share 172.31.0.0/16(rw sync no_subtree_check no_root_squash)
+          # :wq
+      # sudo exportfs -a 
+      # sudo systemctl restart nfs-kernel-server
+      # sudo systemctl status nfs-kernel-server
+   
+
+    # install client software nfs in all kubernets nodes include master
+      # sudo apt install nfs-common -y  
+
+
+# using PersistentVolume and  PersistentVolumeClaim      
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springapp
+  namespace: test-ns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: springapp
+  template:
+    metadata:
+      name: springapppod
+      lables:
+        app: springapp
+    spec:
+      containers:
+      - name: springappcontainer
+        image: vaddevenkat/springboot-application:1
+        ports:
+        - containerPort: 8080
+        env:
+        - name: MONGO_DB_HOSTNAME
+          value: mongosvc
+        - name: MONGO_DB_USERNAME 
+          value: devdb
+        - name: MONGO_DB_PASSWORD
+          value: devdb@123
+---
+apiVersion: v1 
+kind: Service
+metadata:
+  name: springappsvc
+  namespace: test-ns
+spec:
+  type: NodePort
+  selector:  
+    app: springapp
+  ports:
+  - port: 80
+    targetPort: 8080 
+---
+apiVersion: app/v1
+kind: ReplicaSet
+metadata:
+  name: mongodb
+  namepsace: test-ns
+spec:
+  selector:
+    matchLabels:
+      name: mongodb
+  template:
+    name: mongodbpod
+    lables:
+      name: mongodb
+  spec:
+    containers:
+    - name: mongodbcontainer
+      image: mongo
+      ports:
+      - containerPort: 27017
+      env:
+      - name: MONGO_INITDB_ROOT_USERNAME
+        value: devdb
+      - name: MONGO_INITDB_ROOT_PASSWORD
+        value: devdb123 
+        volumeMounts:
+        - name: mongodbvol
+          mountPath: /data/db
+    volumes:
+    - name: mongodbvol
+      PersistentVolumeClaimnfs:
+        claimName: mongopvc
+---
+apiVersion: v1 
+kind: PersistentVolumeClaim
+metadata:
+  name: mongopvc
+  namespace: test-ns
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  
+---
+apiVersion: v1 
+kind: Service
+metadata: 
+  name: mongosvc
+  namepsace: test-ns
+spec:
+  selector:
+    name: mongodb
+  type: ClusterIP
+  ports:
+  - port: 27017
+    targetPort: 27017
+---            
+# nfspv.yaml
+apiVersion: v1 
+kind: PersistentVolume
+metadata:
+  name: nfsvol
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  nfs:
+    server: 172:31:34:161
+    path: /mnt/nfs_share
+---     
+#hostpathpv.yaml
+apiVersion: v1 
+kind: PersistentVolume
+metadata: 
+  name: hostPath
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
+  hostPath:
+    path: /temp
+---
+  
+
+            
+
+
+
+
+
+
+
+
+    
+                  
+                  
+
+
+            
+
+
+
+
+
+
+
+
+    
+                  
+                  

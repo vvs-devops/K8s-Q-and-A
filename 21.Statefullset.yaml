@@ -1,0 +1,7 @@
+statefullSet is the recommanded way to deploy the statefull applications.
+bcoz of some features.StatefullSet will create pods and manage pod lifesyscle and scaling.
+statefullset provides stable network identifiers and stable volumes for each replica of a StatefulSet.
+statelss applications deploy deployment 
+
+
+StatefulSet is kuberntes resource used to manage statefull applications. It manages the deploymnet and scaling of pods and provides guarantee abouve the ordering and uniqueness of these pods.
