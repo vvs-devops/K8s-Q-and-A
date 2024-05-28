@@ -37,7 +37,7 @@ A Replication Controller is a structure that enables you to easily create multip
 5) What is the difference between the replication controller and a replica set?
 6) What is Daemon set ?
 DaemonSet is a Kubernetes feature that lets you run a Kubernetes pod on all cluster nodes that meet certain criteria. Every time a new node is added to a cluster, the pod is added to it, and when a node is removed from the cluster, the pod is removed.
-<!-- 7) Difference between Kubernetes & Docker Swarm ? -->
+7) Difference between Kubernetes & Docker Swarm ? 
 Docker Swarm and Kubernetes are both popular container orchestration tools used to manage the deployment, scaling, and networking of containerized applications. While both share similar goals, they have distinct characteristics that cater to different needs. 
 Use Kubernetes if:
 You need a highly scalable and feature-rich platform for large-scale deployments.
