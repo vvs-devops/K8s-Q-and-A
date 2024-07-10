@@ -134,4 +134,3 @@ watch kubectl get pods					watch kubectl get ep
 
 kubectl rollout history deployment mavenweappdeployment
 kubectl rollout undo deployment mavenweappdeployment --to--revision 1
-	
